@@ -14,6 +14,12 @@ const register = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
+    // Check if username already exists
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -57,12 +63,12 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { uid: newUser.uid, username: newUser.username },
+      { uid: user.uid, username: user.username },
       process.env.JWT_SECRET,
       { expiresIn: "1d", algorithm: "HS256" }
     );
 
-    res.status(201).json({ username: newUser.username, token });
+    res.status(201).json({ username: user.username, token });
   } catch (error) {
     return res.status(500).json({ message: "Server error" });
   }

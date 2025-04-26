@@ -9,23 +9,23 @@ const getValidToken = () => {
     const decode = jwtDecode(token); // Decode the token to get the expiration time
     if (decode.exp * 1000 < Date.now()) {
       localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      localStorage.removeItem("username");
       return null;
     }
     return token;
   } catch (error) {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.removeItem("username");
     return null;
   }
 };
 
 const token = getValidToken();
-const user = token ? JSON.parse(localStorage.getItem("user")) : null;
+const username = token ? JSON.parse(localStorage.getItem("username")) : null;
 
 const initialState = {
   token: token,
-  user: user,
+  username: username,
   isAuthenticated: !!token,
 };
 
@@ -35,12 +35,12 @@ const authSlice = createSlice({
   reducers: {
     login(state, action) {
       state.token = action.payload.token;
-      state.user = action.payload.user;
+      state.username = action.payload.username;
       state.isAuthenticated = true;
     },
     logout(state) {
       state.token = null;
-      state.user = null;
+      state.username = null;
       state.isAuthenticated = false;
     },
   },
