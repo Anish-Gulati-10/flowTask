@@ -1,5 +1,5 @@
-import { Schema, model } from "mongoose";
-import { v4 as uuid } from "uuid";
+const { Schema, model } = require("mongoose")
+const { v4: uuid } = require("uuid");
 
 const userSchema = new Schema({
   username: {
@@ -32,4 +32,4 @@ const userSchema = new Schema({
 });
 
 const User = model("User", userSchema);
-export default User;
+module.exports = User;

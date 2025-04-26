@@ -1,7 +1,7 @@
-import express from "express";
-import cors from "cors";
-import CorsOptions from "./config/CorsOptions";
-import authRouter from "./routes/auth.routes";
+const express = require("express");
+const cors = require("cors");
+const CorsOptions = require("./config/CorsOptions.js");
+const authRouter = require("./routes/auth.routes.js");
 
 const app = express();
 
@@ -11,4 +11,4 @@ app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
 app.use('/api/auth', authRouter);
 
-export default app;
+module.exports = app;

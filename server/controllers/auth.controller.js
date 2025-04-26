@@ -1,9 +1,9 @@
-import User from "../models/User.model";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+const User = require("../models/User.model.js")
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const register = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password } = req?.body;
   try {
     if (!username || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
@@ -68,4 +68,4 @@ const login = async (req, res) => {
   }
 };
 
-export { register, login };
+module.exports = { register, login };
