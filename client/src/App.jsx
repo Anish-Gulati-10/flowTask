@@ -1,14 +1,52 @@
-import { Button } from "./components/ui/button"
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
+import Boards from "@/pages/Boards";
+import BoardView from "@/pages/BoardView";
+import { useSelector } from "react-redux";
 
-
-function App() {
-
-  return (
-    <section className='min-h-screen flex flex-col items-center justify-center'>
-      <Button>test</Button>
-    </section>
-      
-  )
+function PrivateRoute({auth}) {
+  return auth ? <Outlet /> : <Navigate to="/login" />;
 }
 
-export default App
+function PublicRoute({ auth, children }) {
+  return auth ? <Navigate to="/boards" /> : children;
+}
+
+function App() {
+  const { isAuthenticated } = useSelector((state) => state.auth)
+
+  console.log(isAuthenticated)
+
+  return (
+    <BrowserRouter>
+      <Routes>
+
+        {/* Redirect root to /boards or /login */}
+        <Route path="/" element={<Navigate to={isAuthenticated ? "/boards" : "/login"} />} />
+
+        {/* Public Routes */}
+        <Route path="/login" element={
+          <PublicRoute auth={isAuthenticated}>
+            <Login />
+          </PublicRoute>
+        }/>
+
+        <Route path="/signup" element={
+          <PublicRoute auth={isAuthenticated}>
+            <Signup />
+          </PublicRoute>
+        }/>
+
+        {/* Private Routes */}
+        <Route element={<PrivateRoute auth={isAuthenticated}/>}>
+          <Route path="/boards" element={<Boards />} />
+          <Route path="/boards/:boardId/*" element={<BoardView />} />
+        </Route>
+
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
