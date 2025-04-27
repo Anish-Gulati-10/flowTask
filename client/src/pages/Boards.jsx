@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import CreateNewBoardCard from "@/components/CreateNewBoardCard";
+import { Trash } from "lucide-react";
 
 const Boards = () => {
   const [ownedBoards, setOwnedBoards] = useState([]);
@@ -77,6 +78,17 @@ const Boards = () => {
       setErrorMsg(error.message);
     }
   };
+
+  const handleDeletion = async (boardId) => {
+    try {
+      const response = await axiosInstance.delete(`/boards/${boardId}`);
+      if (response.status === 200) {
+        setOwnedBoards((prev) => prev.filter((board) => board._id !== boardId));
+      }
+    } catch (error) {
+      setErrorMsg(error.message);
+    }
+  }
 
 
   if (ownedBoards.length === 0 && sharedBoards.length === 0) {
@@ -151,10 +163,11 @@ const Boards = () => {
                 <div
                   key={board._id}
                   className="bg-white dark:bg-background shadow-sm rounded-md overflow-hidden">
-                  <div className="p-4 bg-[#2073f7] text-white">
+                  <div className="p-4 bg-[#2073f7] text-white flex items-center justify-between">
                     <h3 className="text-lg font-bold tracking-wide">
                       {board.title}
                     </h3>
+                    <Trash className="hover:cursor-pointer hover-scale-on" onClick={() => handleDeletion(board._id)}/>
                   </div>
                   <div className="p-4 flex flex-col gap-3">
                     <p className="text-gray-600 dark:text-gray-400 text-base">

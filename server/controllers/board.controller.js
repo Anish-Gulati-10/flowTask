@@ -67,8 +67,31 @@ const getListsByBoardId = async (req, res) => {
   }
 };
 
+const deleteBoard = async (req, res) => {
+  try {
+    const { boardId } = req.params;
+    if (!boardId) {
+      return res.status(400).json({ message: "Board ID is required" });
+    }
+    const board = await Board.findById(boardId);
+    if (!board) {
+      return res.status(404).json({ message: "Board not found" });
+    } 
+    if (board.owner.toString() !== req.user.uid) {
+      return res.status(403).json({ message: "You are not authorized to delete this board" });
+    }
+    await List.deleteMany({ board: boardId });
+    await board.deleteOne();
+    return res.status(200).json({ message: "Board deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting board:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   createBoard,
   getMyBoards,
   getListsByBoardId,
+  deleteBoard,
 };
