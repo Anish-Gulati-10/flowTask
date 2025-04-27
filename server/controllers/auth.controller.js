@@ -31,7 +31,7 @@ const register = async (req, res) => {
     });
 
     const token = jwt.sign(
-      { uid: newUser.uid, username: newUser.username },
+      { uid: newUser._id, username: newUser.username },
       process.env.JWT_SECRET,
       { expiresIn: "1d", algorithm: "HS256" }
     );
@@ -63,7 +63,7 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { uid: user.uid, username: user.username },
+      { uid: user._id, username: user.username },
       process.env.JWT_SECRET,
       { expiresIn: "1d", algorithm: "HS256" }
     );

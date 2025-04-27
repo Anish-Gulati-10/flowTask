@@ -1,5 +1,4 @@
 const { Schema, model } = require("mongoose")
-const { v4: uuid } = require("uuid");
 
 const userSchema = new Schema({
   username: {
@@ -9,11 +8,6 @@ const userSchema = new Schema({
     trim: true,
     lowercase: true,
     index: true
-  },
-  uid: {
-    type: String,
-    default: uuid,
-    unique: true,
   },
   email: {
     type: String,
