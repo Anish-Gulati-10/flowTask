@@ -3,6 +3,7 @@ const cors = require("cors");
 const CorsOptions = require("./config/CorsOptions.js");
 const authRouter = require("./routes/auth.routes.js");
 const boardRouter = require("./routes/board.routes.js");
+const listRouter = require("./routes/list.routes.js");
 
 const app = express();
 
@@ -12,5 +13,6 @@ app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
 app.use('/api/auth', authRouter);
 app.use('/api/boards', boardRouter);
+app.use('/api/lists', listRouter)
 
 module.exports = app;

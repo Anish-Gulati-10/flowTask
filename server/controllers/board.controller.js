@@ -51,17 +51,13 @@ const getListsByBoardId = async (req, res) => {
     if (!board) {
       return res.status(404).json({ message: "Board not found" });
     }
+    const boardName = board.title;
     if (board.owner.toString() !== req.user.uid && !board.members.includes(req.user.uid)) {
       board.members.push(req.user.uid);
       await board.save();
     }
-
-    const lists = await List.find({ board: boardId }).sort({ position: 1 });
-
-    if (!lists || lists.length === 0) {
-      return res.status(204).json([]);
-    }
-    return res.status(200).json({ lists });
+    const lists = await List.find({ board: boardId }).sort({ position: 1 });  
+    return res.status(200).json({ lists, boardName });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }
