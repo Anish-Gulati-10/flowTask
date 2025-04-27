@@ -41,7 +41,7 @@ export function LoginForm({
       localStorage.setItem("username", JSON.stringify(username))
       dispatch(login({ token, username }))
       navigate("/boards")
-    } catch (error) {
+    } catch (err) {
       console.error(err);
       setErrorMsg(err.response?.data?.message || "Login failed. Try again.");
     }

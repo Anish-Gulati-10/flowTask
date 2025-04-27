@@ -2,6 +2,7 @@ import React from 'react'
 import { Button } from './ui/button'
 import { CircleUserRound } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
+import { logout } from '@/store/slices/authSlice'
 
 const Navbar = () => {
     const { username } = useSelector((state) => state.auth)

@@ -202,7 +202,7 @@ const Boards = () => {
                 <div
                   key={board._id}
                   className="bg-white dark:bg-background shadow-sm rounded-md overflow-hidden">
-                  <div className="p-4 bg-[#2073f7] text-white">
+                  <div className="p-4 bg-[#a74bfd] text-white">
                     <h3 className="text-lg font-bold tracking-wide">
                       {board.title}
                     </h3>
