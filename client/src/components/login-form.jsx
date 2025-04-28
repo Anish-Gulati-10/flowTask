@@ -13,8 +13,8 @@ import { useState } from "react"
 import { useDispatch } from "react-redux"
 import { Link, useNavigate } from "react-router-dom"
 import { login } from "@/store/slices/authSlice"
-import axios from "axios"
 import { logoFilled } from "@assets"
+import axiosInstance from "@/utils/axiosInstance"
 
 
 
@@ -32,7 +32,7 @@ export function LoginForm({
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
+      const response = await axiosInstance.post(`/auth/login`, {
         email,
         password,
       })
@@ -43,7 +43,7 @@ export function LoginForm({
       navigate("/boards")
     } catch (err) {
       console.error(err);
-      setErrorMsg(err.response?.data?.message || "Login failed. Try again.");
+      setErrorMsg(err.message || "Login failed. Try again.");
     }
   }
 

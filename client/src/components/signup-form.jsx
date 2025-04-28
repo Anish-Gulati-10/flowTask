@@ -13,8 +13,8 @@ import { useState } from "react"
 import { useDispatch } from "react-redux"
 import { Link, useNavigate } from "react-router-dom"
 import { login } from "@/store/slices/authSlice"
-import axios from "axios"
 import { logoFilled } from "@assets"
+import axiosInstance from "@/utils/axiosInstance"
 
 
 
@@ -43,7 +43,7 @@ export function SignupForm({
       return
     }
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/register`, {
+      const response = await axiosInstance.post(`/auth/register`, {
         username,
         email,
         password,
