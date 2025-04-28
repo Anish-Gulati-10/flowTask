@@ -1,6 +1,7 @@
 const Board = require("../models/Board.model");
 const List = require("../models/List.model");
 const Task = require("../models/Task.model");
+const Comment = require("../models/Comment.model");
 
 const createBoard = async (req, res) => {
   try {
@@ -88,7 +89,6 @@ const deleteBoard = async (req, res) => {
     for (const list of lists) {
       // For each List, delete its Tasks
       const tasks = await Task.find({ list: list._id });
-
       for (const task of tasks) {
         // For each Task, delete its Comments
         await Comment.deleteMany({ task: task._id });

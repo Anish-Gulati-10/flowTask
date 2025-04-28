@@ -50,7 +50,7 @@ const BoardView = () => {
   const [taskDescription, setTaskDescription] = useState("");
   const [taskDueDate, setTaskDueDate] = useState(null);
   const [taskPriority, setTaskPriority] = useState("low");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [openDialogListId, setOpenDialogListId] = useState(null);
   const { boardId } = useParams();
 
   useEffect(() => {
@@ -126,7 +126,6 @@ const BoardView = () => {
         setErrorMsg("Due date is required");
         return;
       }
-      console.log(listId)
       const response = await axiosInstance.post(`/tasks/create`, {
         title: taskName,
         description: taskDescription,
@@ -146,7 +145,7 @@ const BoardView = () => {
         setTaskDescription("");
         setTaskDueDate(null);
         setTaskPriority("low");
-        setIsDialogOpen(false);
+        setOpenDialogListId(null)
       }
       setErrorMsg(null);
     } catch (error) {
@@ -161,6 +160,7 @@ const BoardView = () => {
     setTaskDueDate(null);
     setTaskPriority('low');
     setErrorMsg('');
+    setOpenDialogListId(null)
   };
 
   if (lists.length === 0) {
@@ -212,9 +212,8 @@ const BoardView = () => {
       <BoardNavbar boardName={boardTitle} />
       <div className="px-2 md:px-10 sm:px-5 py-2 h-full">
         <div className="flex flex-wrap sm:flex-nowrap gap-6 overflow-x-auto pb-4 h-full">
-          {lists.map((list) => {
-            const randomColor =
-              colors[Math.floor(Math.random() * colors.length)];
+          {lists.map((list, index) => {
+            const randomColor = colors[index % colors.length];
             return (
               <div
                 key={list._id}
@@ -232,16 +231,16 @@ const BoardView = () => {
                 </div>
                 <div className="grid grid-cols-1 overflow-y-auto">
                   {list?.tasks?.map((task) => {
-                    console.log(task);
                     return <h1>{task.title}</h1>;
                   })}
                   <Dialog 
-                  open={isDialogOpen}
+                  open={openDialogListId === list._id}
                   onOpenChange={(open) => {
                     if (!open) {
                       handleDialogClose();
+                    } else {
+                      setOpenDialogListId(list._id);
                     }
-                    setIsDialogOpen(open);
                   }}>
                     <DialogTrigger asChild>
                       <div className="flex-center flex-col gap-1 hover:bg-gray-50 dark:hover:bg-gray-800 transition p-4 cursor-pointer">
