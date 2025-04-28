@@ -201,6 +201,19 @@ const BoardView = () => {
 
     if (!movingTask) return;
 
+    // Update backend
+    try {
+      setLoading(true);
+      setErrorMsg(null);
+      await axiosInstance.patch(`/tasks/move/${taskId}`, {
+        listId: newListId,
+      });
+      setLoading(false);
+    } catch (error) {
+      console.error("Failed to move task:", error);
+      setErrorMsg("Failed to move task. Please try again.");
+    }
+
     // Update frontend
     setLists((prevLists) => {
       const updatedLists = prevLists.map((list) => {
@@ -220,15 +233,6 @@ const BoardView = () => {
       });
       return updatedLists;
     });
-    console.log("upadte backend");
-    // Update backend
-    /* try {
-      await axiosInstance.patch(`/tasks/${taskId}`, {
-        listId: newListId,
-      });
-    } catch (error) {
-      console.error("Failed to move task:", error);
-    } */
   };
 
   return (

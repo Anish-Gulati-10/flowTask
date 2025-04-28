@@ -75,8 +75,45 @@ const deleteTask = async (req, res) => {
   }
 };
 
+const moveTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { listId } = req.body;
+
+    if (!listId || !taskId) {
+      return res.status(400).json({ message: "List ID and Task ID are required" });
+    }
+
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    const newList = await List.findById(listId);
+    if (!newList) {
+      return res.status(404).json({ message: "New list not found" });
+    }
+
+    const oldList = await List.findById(task.list);
+    if (oldList) {
+      oldList.tasks = oldList.tasks.filter((t) => t.toString() !== taskId);
+      await oldList.save();
+    }
+
+    task.list = newList._id;
+    await task.save();
+    newList.tasks.push(task._id);
+    await newList.save();
+    return res.status(200).json({ message: "Task moved successfully" });
+} catch (error) {
+    console.error("Error moving task:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   createTask,
   updateTask,
   deleteTask,
+  moveTask,
 };
