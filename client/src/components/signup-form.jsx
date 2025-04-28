@@ -27,6 +27,7 @@ export function SignupForm({
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [errorMsg, setErrorMsg] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -34,6 +35,7 @@ export function SignupForm({
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErrorMsg(null)
+    setLoading(true)
     if (password !== confirmPassword) {
       setErrorMsg("Passwords do not match")
       return
@@ -57,6 +59,8 @@ export function SignupForm({
     } catch (error) {
       setErrorMsg(error.response?.data?.message || "Something went wrong");
       console.error(error.message);
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -74,19 +78,19 @@ export function SignupForm({
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="harvey@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Input id="email" type="email" placeholder="harvey@example.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} required />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="username">Username</Label>
-                <Input id="username" type="text" placeholder="Harvey" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                <Input id="username" type="text" placeholder="Harvey" value={username} onChange={(e) => setUsername(e.target.value)} disabled={loading} required />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} required />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+                <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={loading} required />
               </div>
               {errorMsg && <p className="text-red-500 text-sm">{errorMsg}</p>}
               <Button type="submit" className="w-full">
