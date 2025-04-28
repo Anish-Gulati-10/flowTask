@@ -23,7 +23,7 @@
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.503.0",
     "react": "^19.0.0",
-    "react-day-picker": "^8.10.1",
+    "react-day-picker": "^9.6.7",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.30.0",
