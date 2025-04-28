@@ -5,6 +5,7 @@ const authRouter = require("./routes/auth.routes.js");
 const boardRouter = require("./routes/board.routes.js");
 const listRouter = require("./routes/list.routes.js");
 const taskRouter = require("./routes/task.routes.js");
+const commentRouter = require("./routes/comment.routes.js");
 
 const app = express();
 
@@ -19,5 +20,6 @@ app.use("/api/auth", authRouter);
 app.use("/api/boards", boardRouter);
 app.use("/api/lists", listRouter);
 app.use("/api/tasks", taskRouter);
+app.use("/api/comment", commentRouter);
 
 module.exports = app;

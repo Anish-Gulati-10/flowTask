@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Hand, Pencil, Trash } from "lucide-react";
+import { CircleUserRound, Hand, Pencil, Trash } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   Select,
@@ -23,18 +23,20 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/datePicker";
 import axiosInstance from "@/utils/axiosInstance";
+import { useSelector } from "react-redux";
 
 const TaskDialog = ({ task, listeners, attributes }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [localTask, setLocalTask] = useState(task);
   const [taskName, setTaskName] = useState(task.title || "");
-  const [taskDescription, setTaskDescription] = useState(
-    task.description || ""
-  );
+  const [taskDescription, setTaskDescription] = useState(task.description || "");
   const [taskDueDate, setTaskDueDate] = useState(task.dueDate || null);
   const [taskPriority, setTaskPriority] = useState(task.priority || "low");
+  const [newCommentText, setNewCommentText] = useState('');
+  const [newCommentLoading, setNewCommentLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const { username } = useSelector((state) => state.auth)
 
   const handleDeletion = async () => {
     try {
@@ -50,6 +52,51 @@ const TaskDialog = ({ task, listeners, attributes }) => {
       setLoading(false);
     }
   };
+
+  const handlePostComment = async (taskId) => {
+    console.log(newCommentText, taskId);
+    if (!newCommentText.trim()) return;
+    setNewCommentLoading(true);
+    try {
+      const response = await axiosInstance.post(`/comment/${taskId}`, {
+        content: newCommentText,
+      });
+  
+      // Update local comments
+      setLocalTask((prev) => ({
+        ...prev,
+        comments: [...(prev.comments || []), response.data.comment],
+      }));
+  
+      setNewCommentText('');
+    } catch (error) {
+      console.error("Failed to post comment:", error);
+      setErrorMsg(error.message || "Failed to post comment. Please try again.");
+    } finally {
+      setNewCommentLoading(false);
+    }
+  };
+  
+  const handleEditComment = (comment) => {
+    // You can open a small inline edit input, or open a Dialog again
+    console.log("Edit comment clicked:", comment);
+  };
+
+  const deleteTask = async (commentId) => {
+    try {
+      const response = await axiosInstance.delete(`/comment/${commentId}`);
+      if (response.status === 200) {
+        setLocalTask((prev) => ({
+          ...prev,
+          comments: prev.comments.filter((comment) => comment._id !== commentId),
+        }));
+      }
+      setErrorMsg("");
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      setErrorMsg("Failed to delete comment. Please try again.");
+    }
+  }
 
   const handleUpdateTask = async (taskId) => {
     try {
@@ -192,6 +239,45 @@ const TaskDialog = ({ task, listeners, attributes }) => {
               </SelectContent>
             </Select>
           </div>
+
+          {/* --- Comments Section --- */}
+          {!isEditing && <div>
+            <h3 className="text-base font-semibold">Comments</h3>
+            {localTask.comments?.length > 0 ? (
+              <div className="flex flex-col gap-3">
+                {localTask.comments.map((comment) => (
+                  <div key={comment._id} className="py-1 flex flex-col">
+                    <div className="flex items-center justify-between">
+                      <div className="flex gap-1">
+                        <CircleUserRound />
+                        <p className="font-medium">{comment.authorUsername}</p>
+                      </div>
+                      {comment.authorUsername === username && <Trash size={16} onClick={() => deleteTask(comment._id)} className="cursor-pointer"/>}             
+                    </div>
+                    <p className="text-sm text-muted-foreground">{comment.content}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No comments yet.</p>
+            )}
+
+            {/* Add Comment */}
+            <div className="flex flex-col gap-2 mt-2">
+              <Textarea
+                placeholder="Write a comment..."
+                value={newCommentText}
+                onChange={(e) => setNewCommentText(e.target.value)}
+              />
+              {errorMsg && <span className="text-red-500">{errorMsg}</span>}
+              <Button
+                onClick={() => handlePostComment(localTask._id)}
+                disabled={newCommentLoading}
+              >
+                {newCommentLoading ? "Posting..." : "Post Comment"}
+              </Button>
+          </div>
+          </div>}
         </div>
         {isEditing && (
           <DialogFooter className="flex !flex-col gap-2">

@@ -62,6 +62,13 @@ const getListsByBoardId = async (req, res) => {
     for (const list of fetchedLists) {
       const tasks = await Task.find({ list: list._id });
       const priorityOrder = { high: 0, medium: 1, low: 2 };
+
+      // Fetch comments for each task
+      for (const task of tasks) {
+        const comments = await Comment.find({ task: task._id }).sort({ createdAt: 1 });
+        task.comments = comments;
+      }
+
       tasks.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
       list.tasks = tasks;
     }
