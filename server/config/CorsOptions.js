@@ -1,6 +1,6 @@
 // Cross Origin Resource Sharing
 const whitelist = [
-  "https://flow-task-delta.vercel.app/",
+  "https://flow-task-delta.vercel.app",
   "http://localhost:5500",
   "http://localhost:5173",
 ];
