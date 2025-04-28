@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Pencil, Trash } from "lucide-react";
+import { Hand, Pencil, Trash } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   Select,
@@ -24,7 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "@/components/ui/datePicker";
 import axiosInstance from "@/utils/axiosInstance";
 
-const TaskDialog = ({ task }) => {
+const TaskDialog = ({ task, listeners, attributes }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [localTask, setLocalTask] = useState(task);
   const [taskName, setTaskName] = useState(task.title || "");
@@ -77,7 +77,7 @@ const TaskDialog = ({ task }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="p-4 border hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer flex flex-col gap-2 hover:shadow-md">
+        <div className="relative p-4 border-b hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer flex flex-col gap-2 hover:shadow-md">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold line-clamp-1">
               {localTask.title}
@@ -98,10 +98,14 @@ const TaskDialog = ({ task }) => {
               />
             </Button>
           </div>
-
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {localTask.description}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {localTask.description}
+            </p>
+            <div className="cursor-grab" {...listeners} {...attributes}>
+              <Hand />
+            </div>
+          </div>
         </div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -125,9 +129,7 @@ const TaskDialog = ({ task }) => {
               </div>
             </div>
           </DialogTitle>
-          {localTask.description && (
-            <DialogDescription>{localTask.description}</DialogDescription>
-          )}
+          <DialogDescription></DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           {isEditing && (
