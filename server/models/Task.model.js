@@ -1,12 +1,6 @@
 const mongoose = require("mongoose");
-const { v4: uuidv4 } = require("uuid");
 
 const taskSchema = new mongoose.Schema({
-  uuid: {
-    type: String,
-    default: uuidv4,
-    unique: true
-  },
   title: {
     type: String,
     required: true,
@@ -21,16 +15,17 @@ const taskSchema = new mongoose.Schema({
     ref: "List",
     required: true
   },
-  position: {
-    type: Number,
-    required: true
-  },
+  comments: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment"
+    }],
   dueDate: {
     type: Date
   },
-  assignedTo: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+  priority: {
+    type: String,
+    enum: ["low", "medium", "high"],
+    default: "low"
   }
 }, {
   timestamps: true

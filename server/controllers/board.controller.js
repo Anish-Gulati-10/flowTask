@@ -1,5 +1,6 @@
 const Board = require("../models/Board.model");
 const List = require("../models/List.model");
+const Task = require("../models/Task.model");
 
 const createBoard = async (req, res) => {
   try {
@@ -56,8 +57,14 @@ const getListsByBoardId = async (req, res) => {
       board.members.push(req.user.uid);
       await board.save();
     }
-    const lists = await List.find({ board: boardId }).sort({ position: 1 });  
-    return res.status(200).json({ lists, boardName });
+    const fetchedLists = await List.find({ board: boardId }).sort({ position: 1 });  
+    for (const list of fetchedLists) {
+      const tasks = await Task.find({ list: list._id });
+      const priorityOrder = { high: 0, medium: 1, low: 2 };
+      tasks.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+      list.tasks = tasks;
+    }
+    return res.status(200).json({ fetchedLists, boardName });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }
@@ -76,7 +83,25 @@ const deleteBoard = async (req, res) => {
     if (board.owner.toString() !== req.user.uid) {
       return res.status(403).json({ message: "You are not authorized to delete this board" });
     }
-    await List.deleteMany({ board: boardId });
+    const lists = await List.find({ board: boardId });
+
+    for (const list of lists) {
+      // For each List, delete its Tasks
+      const tasks = await Task.find({ list: list._id });
+
+      for (const task of tasks) {
+        // For each Task, delete its Comments
+        await Comment.deleteMany({ task: task._id });
+
+        // Then delete the Task itself
+        await task.deleteOne();
+      }
+
+      // After tasks deleted, delete the List
+      await list.deleteOne();
+    }
+
+    // Finally delete the Board
     await board.deleteOne();
     return res.status(200).json({ message: "Board deleted successfully" });
   } catch (error) {

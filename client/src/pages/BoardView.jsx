@@ -12,12 +12,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import CreateNewBoardCard from "@/components/CreateNewBoardCard";
 import { Plus, Trash } from "lucide-react";
+import { DatePicker } from "@/components/ui/datePicker";
 
 const colors = [
   "#60a5fa", // Blue-400
@@ -36,6 +46,11 @@ const BoardView = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
   const [listTitle, setListTitle] = useState("");
+  const [taskName, setTaskName] = useState("");
+  const [taskDescription, setTaskDescription] = useState("");
+  const [taskDueDate, setTaskDueDate] = useState(null);
+  const [taskPriority, setTaskPriority] = useState("low");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { boardId } = useParams();
 
   useEffect(() => {
@@ -52,8 +67,7 @@ const BoardView = () => {
           navigate("/boards");
           return;
         }
-        const { lists: fetchedLists, boardName } = response.data;
-        console.log(response.data);
+        const { fetchedLists, boardName } = response.data;
         setBoardTitle(boardName);
         setLists(fetchedLists);
       } catch (error) {
@@ -100,6 +114,53 @@ const BoardView = () => {
       console.error("Error deleting list:", error);
       setErrorMsg(error.message);
     }
+  };
+
+  const handleCreateTask = async (listId) => {
+    try {
+      if (!taskName) {
+        setErrorMsg("Task name is required");
+        return;
+      }
+      if (!taskDueDate) {
+        setErrorMsg("Due date is required");
+        return;
+      }
+      console.log(listId)
+      const response = await axiosInstance.post(`/tasks/create`, {
+        title: taskName,
+        description: taskDescription,
+        dueDate: taskDueDate.toISOString(),
+        priority: taskPriority,
+        listId: listId,
+      });
+      if (response.status === 201) {
+        setLists((prevLists) =>
+          prevLists.map((list) =>
+            list._id === listId
+              ? { ...list, tasks: [...list.tasks, response.data.task] }
+              : list
+          )
+        );
+        setTaskName("");
+        setTaskDescription("");
+        setTaskDueDate(null);
+        setTaskPriority("low");
+        setIsDialogOpen(false);
+      }
+      setErrorMsg(null);
+    } catch (error) {
+      console.error("Error creating task:", error);
+      setErrorMsg(error.message || "Failed to create task. Please try again.");
+    }
+  }
+
+  const handleDialogClose = () => {
+    setTaskName('');
+    setTaskDescription('');
+    setTaskDueDate(null);
+    setTaskPriority('low');
+    setErrorMsg('');
   };
 
   if (lists.length === 0) {
@@ -157,7 +218,7 @@ const BoardView = () => {
             return (
               <div
                 key={list._id}
-                className="flex-shrink-0 w-full sm:w-[300px] md:w-[450px] bg-white dark:bg-background shadow-sm rounded-md overflow-hidden h-full">
+                className="flex-shrink-0 w-full sm:w-[300px] md:w-[450px] bg-white dark:bg-background shadow-sm rounded-md overflow-hidden h-full border border-gray-200 dark:border-gray-700">
                 <div
                   className="p-4 text-white flex items-center justify-between"
                   style={{ backgroundColor: randomColor }}>
@@ -169,8 +230,93 @@ const BoardView = () => {
                     onClick={() => handleDeletion(list._id)}
                   />
                 </div>
-                <div className="p-4 flex flex-col gap-3">
-                  {/* Later you can map tasks here */}
+                <div className="grid grid-cols-1 overflow-y-auto">
+                  {list?.tasks?.map((task) => {
+                    console.log(task);
+                    return <h1>{task.title}</h1>;
+                  })}
+                  <Dialog 
+                  open={isDialogOpen}
+                  onOpenChange={(open) => {
+                    if (!open) {
+                      handleDialogClose();
+                    }
+                    setIsDialogOpen(open);
+                  }}>
+                    <DialogTrigger asChild>
+                      <div className="flex-center flex-col gap-1 hover:bg-gray-50 dark:hover:bg-gray-800 transition p-4 cursor-pointer">
+                        <div className="bg-gray-200 dark:bg-gray-700 rounded-full p-3">
+                          <Plus className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                        </div>
+                        <p className="mt-4 text-gray-600 dark:text-gray-400 text-sm font-medium">
+                          Add a New Task
+                        </p>
+                      </div>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Create a New Task</DialogTitle>
+                        <DialogDescription>
+                          Fill in the details below to add a new task to your board.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="newTaskName" className="text-left">
+                            Task Name
+                          </Label>
+                          <Input
+                            id="newTaskName"
+                            value={taskName}
+                            onChange={(e) => setTaskName(e.target.value)}
+                            placeholder="Task Name"
+                            className="col-span-3"
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-start gap-4">
+                          <Label htmlFor="newTaskDescription" className="text-left">
+                            Description
+                          </Label>
+                          <Textarea
+                            id="newTaskDescription"
+                            value={taskDescription}
+                            onChange={(e) => setTaskDescription(e.target.value)}
+                            placeholder="Task Description"
+                            className="col-span-3"
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="dueDate" className="text-left">
+                            Due Date
+                          </Label>
+                          <div className="col-span-3">
+                            <DatePicker date={taskDueDate} setDate={setTaskDueDate}/>
+                          </div>                
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="priority" className="text-left">
+                            Priority
+                          </Label>
+                          <Select value={taskPriority} onValueChange={setTaskPriority}>
+                            <SelectTrigger className="col-span-3">
+                              <SelectValue placeholder="Select priority" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectItem value="low">Low</SelectItem>
+                                <SelectItem value="medium">Medium</SelectItem>
+                                <SelectItem value="high">High</SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <DialogFooter className="flex !flex-col gap-2">
+                        {errorMsg && <span className="text-red-500">{errorMsg}</span>}
+                        <Button onClick={() => handleCreateTask(list._id)}>Create task</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             );

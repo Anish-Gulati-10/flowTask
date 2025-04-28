@@ -14,13 +14,9 @@ const createList = async (req, res) => {
       return res.status(404).json({ message: "Board not found" });
     }
 
-    // Count how many lists already exist in the board (for positioning)
-    const listCount = await List.countDocuments({ board: boardId });
-
     const newList = await List.create({
       title,
       board: boardId,
-      position: listCount, // New list goes to the end
     });
 
     return res

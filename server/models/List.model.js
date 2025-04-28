@@ -21,10 +21,6 @@ const listSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Task"
   }],
-  position: {
-    type: Number,
-    required: true
-  }
 }, {
   timestamps: true
 });

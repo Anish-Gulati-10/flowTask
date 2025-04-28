@@ -4,6 +4,7 @@ const CorsOptions = require("./config/CorsOptions.js");
 const authRouter = require("./routes/auth.routes.js");
 const boardRouter = require("./routes/board.routes.js");
 const listRouter = require("./routes/list.routes.js");
+const taskRouter = require("./routes/task.routes.js");
 
 const app = express();
 
@@ -17,5 +18,6 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/boards", boardRouter);
 app.use("/api/lists", listRouter);
+app.use("/api/tasks", taskRouter);
 
 module.exports = app;
