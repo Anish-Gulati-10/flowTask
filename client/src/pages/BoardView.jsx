@@ -28,6 +28,7 @@ import { useNavigate } from "react-router-dom";
 import CreateNewBoardCard from "@/components/CreateNewBoardCard";
 import { Plus, Trash } from "lucide-react";
 import { DatePicker } from "@/components/ui/datePicker";
+import TaskDialog from "@/components/TaskDialog";
 
 const colors = [
   "#60a5fa", // Blue-400
@@ -230,9 +231,9 @@ const BoardView = () => {
                   />
                 </div>
                 <div className="grid grid-cols-1 overflow-y-auto">
-                  {list?.tasks?.map((task) => {
-                    return <h1>{task.title}</h1>;
-                  })}
+                  {list?.tasks?.map((task) => 
+                    <TaskDialog task={task} />
+                  )}
                   <Dialog 
                   open={openDialogListId === list._id}
                   onOpenChange={(open) => {

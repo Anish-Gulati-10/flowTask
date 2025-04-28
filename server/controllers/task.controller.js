@@ -48,7 +48,7 @@ const updateTask = async (req, res) => {
       if (priority) task.priority = priority;
   
       await task.save();
-  
+      console.log("Task updated successfully:", task);
       return res.status(200).json({ message: "Task updated successfully", task });
     } catch (error) {
       console.error("Error updating task:", error);
@@ -56,7 +56,27 @@ const updateTask = async (req, res) => {
     }
   };
 
+const deleteTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const task = await Task.findByIdAndDelete(taskId);
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+    const list = await List.findOne({ tasks: taskId });
+    if (list) {
+      list.tasks = list.tasks.filter((task) => task.toString() !== taskId);
+      await list.save();
+    }
+    return res.status(200).json({ message: "Task deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   createTask,
   updateTask,
+  deleteTask,
 };
