@@ -11,8 +11,11 @@ app.use(cors(CorsOptions));
 app.use(express.json({ limit: "100kb" }));
 app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
-app.use('/api/auth', authRouter);
-app.use('/api/boards', boardRouter);
-app.use('/api/lists', listRouter)
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Welcome to the Flow Task API" });
+});
+app.use("/api/auth", authRouter);
+app.use("/api/boards", boardRouter);
+app.use("/api/lists", listRouter);
 
 module.exports = app;

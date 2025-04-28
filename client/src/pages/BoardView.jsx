@@ -92,13 +92,15 @@ const BoardView = () => {
     try {
       const response = await axiosInstance.delete(`lists/${listId}`);
       if (response.status === 200) {
-        setLists((prevLists) => prevLists.filter((list) => list._id !== listId));
+        setLists((prevLists) =>
+          prevLists.filter((list) => list._id !== listId)
+        );
       }
     } catch (error) {
       console.error("Error deleting list:", error);
       setErrorMsg(error.message);
     }
-  }
+  };
 
   if (lists.length === 0) {
     return (
@@ -156,7 +158,9 @@ const BoardView = () => {
               <div
                 key={list._id}
                 className="flex-shrink-0 w-full sm:w-[300px] md:w-[450px] bg-white dark:bg-background shadow-sm rounded-md overflow-hidden h-full">
-                <div className="p-4 text-white flex items-center justify-between" style={{ backgroundColor: randomColor }}>
+                <div
+                  className="p-4 text-white flex items-center justify-between"
+                  style={{ backgroundColor: randomColor }}>
                   <h3 className="text-lg font-bold tracking-wide">
                     {list.title}
                   </h3>
