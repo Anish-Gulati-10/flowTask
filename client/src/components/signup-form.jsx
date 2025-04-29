@@ -38,10 +38,12 @@ export function SignupForm({
     setLoading(true)
     if (password !== confirmPassword) {
       setErrorMsg("Passwords do not match")
+      setLoading(false)
       return
     }
     if (password.length < 6) {
       setErrorMsg("Password must be at least 6 characters long")
+      setLoading(false)
       return
     }
     try {
