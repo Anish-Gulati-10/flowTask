@@ -130,7 +130,7 @@ const TaskDialog = ({ task, listeners, attributes }) => {
       <DialogTrigger asChild>
         <div className="flex border-b hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors hover:shadow-md">
           <div
-            className="cursor-grab flex-center pl-1"
+            className="cursor-grab flex-center pl-1 pr-2"
             {...listeners}
             {...attributes}>
             <svg
@@ -147,7 +147,7 @@ const TaskDialog = ({ task, listeners, attributes }) => {
               <circle cx="8" cy="16" r="2" fill="#C2C2C2" />
             </svg>
           </div>
-          <div className="relative p-4  cursor-pointer flex flex-col gap-2 ">
+          <div className="relative p-4 pl-2 cursor-pointer flex flex-col gap-2 flex-1">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold line-clamp-1">
                 {localTask.title}
