@@ -29,14 +29,16 @@ const TaskDialog = ({ task, listeners, attributes }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [localTask, setLocalTask] = useState(task);
   const [taskName, setTaskName] = useState(task.title || "");
-  const [taskDescription, setTaskDescription] = useState(task.description || "");
+  const [taskDescription, setTaskDescription] = useState(
+    task.description || ""
+  );
   const [taskDueDate, setTaskDueDate] = useState(task.dueDate || null);
   const [taskPriority, setTaskPriority] = useState(task.priority || "low");
-  const [newCommentText, setNewCommentText] = useState('');
+  const [newCommentText, setNewCommentText] = useState("");
   const [newCommentLoading, setNewCommentLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const { username } = useSelector((state) => state.auth)
+  const { username } = useSelector((state) => state.auth);
 
   const handleDeletion = async () => {
     try {
@@ -61,14 +63,14 @@ const TaskDialog = ({ task, listeners, attributes }) => {
       const response = await axiosInstance.post(`/comment/${taskId}`, {
         content: newCommentText,
       });
-  
+
       // Update local comments
       setLocalTask((prev) => ({
         ...prev,
         comments: [...(prev.comments || []), response.data.comment],
       }));
-  
-      setNewCommentText('');
+
+      setNewCommentText("");
     } catch (error) {
       console.error("Failed to post comment:", error);
       setErrorMsg(error.message || "Failed to post comment. Please try again.");
@@ -76,7 +78,7 @@ const TaskDialog = ({ task, listeners, attributes }) => {
       setNewCommentLoading(false);
     }
   };
-  
+
   const handleEditComment = (comment) => {
     // You can open a small inline edit input, or open a Dialog again
     console.log("Edit comment clicked:", comment);
@@ -88,7 +90,9 @@ const TaskDialog = ({ task, listeners, attributes }) => {
       if (response.status === 200) {
         setLocalTask((prev) => ({
           ...prev,
-          comments: prev.comments.filter((comment) => comment._id !== commentId),
+          comments: prev.comments.filter(
+            (comment) => comment._id !== commentId
+          ),
         }));
       }
       setErrorMsg("");
@@ -96,7 +100,7 @@ const TaskDialog = ({ task, listeners, attributes }) => {
       console.error("Error deleting comment:", error);
       setErrorMsg("Failed to delete comment. Please try again.");
     }
-  }
+  };
 
   const handleUpdateTask = async (taskId) => {
     try {
@@ -124,33 +128,50 @@ const TaskDialog = ({ task, listeners, attributes }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="relative p-4 border-b hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer flex flex-col gap-2 hover:shadow-md">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold line-clamp-1">
-              {localTask.title}
-            </h3>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1">
-              <span className="capitalize">{localTask.priority}</span>
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  localTask.priority === "high"
-                    ? "bg-red-500"
-                    : localTask.priority === "medium"
-                    ? "bg-yellow-500"
-                    : "bg-green-500"
-                }`}
-              />
-            </Button>
+        <div className="flex border-b hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors hover:shadow-md">
+          <div
+            className="cursor-grab flex-center pl-1"
+            {...listeners}
+            {...attributes}>
+            <svg
+              width="10"
+              height="18"
+              viewBox="0 0 10 18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <circle cx="2" cy="2" r="2" fill="#C2C2C2" />
+              <circle cx="8" cy="2" r="2" fill="#C2C2C2" />
+              <circle cx="8" cy="9" r="2" fill="#C2C2C2" />
+              <circle cx="2" cy="9" r="2" fill="#C2C2C2" />
+              <circle cx="2" cy="16" r="2" fill="#C2C2C2" />
+              <circle cx="8" cy="16" r="2" fill="#C2C2C2" />
+            </svg>
           </div>
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {localTask.description}
-            </p>
-            <div className="cursor-grab" {...listeners} {...attributes}>
-              <Hand />
+          <div className="relative p-4  cursor-pointer flex flex-col gap-2 ">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold line-clamp-1">
+                {localTask.title}
+              </h3>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1">
+                <span className="capitalize">{localTask.priority}</span>
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    localTask.priority === "high"
+                      ? "bg-red-500"
+                      : localTask.priority === "medium"
+                      ? "bg-yellow-500"
+                      : "bg-green-500"
+                  }`}
+                />
+              </Button>
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {localTask.description}
+              </p>
             </div>
           </div>
         </div>
@@ -241,43 +262,56 @@ const TaskDialog = ({ task, listeners, attributes }) => {
           </div>
 
           {/* --- Comments Section --- */}
-          {!isEditing && <div>
-            <h3 className="text-base font-semibold">Comments</h3>
-            {localTask.comments?.length > 0 ? (
-              <div className="flex flex-col gap-3">
-                {localTask.comments.map((comment) => (
-                  <div key={comment._id} className="py-1 flex flex-col">
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-1">
-                        <CircleUserRound />
-                        <p className="font-medium">{comment.authorUsername}</p>
+          {!isEditing && (
+            <div>
+              <h3 className="text-base font-semibold">Comments</h3>
+              {localTask.comments?.length > 0 ? (
+                <div className="flex flex-col gap-3">
+                  {localTask.comments.map((comment) => (
+                    <div key={comment._id} className="py-1 flex flex-col">
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-1">
+                          <CircleUserRound />
+                          <p className="font-medium">
+                            {comment.authorUsername}
+                          </p>
+                        </div>
+                        {comment.authorUsername === username && (
+                          <Trash
+                            size={16}
+                            onClick={() => deleteTask(comment._id)}
+                            className="cursor-pointer"
+                          />
+                        )}
                       </div>
-                      {comment.authorUsername === username && <Trash size={16} onClick={() => deleteTask(comment._id)} className="cursor-pointer"/>}             
+                      <p className="text-sm text-muted-foreground">
+                        {comment.content}
+                      </p>
                     </div>
-                    <p className="text-sm text-muted-foreground">{comment.content}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No comments yet.</p>
-            )}
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No comments yet.
+                </p>
+              )}
 
-            {/* Add Comment */}
-            <div className="flex flex-col gap-2 mt-2">
-              <Textarea
-                placeholder="Write a comment..."
-                value={newCommentText}
-                onChange={(e) => setNewCommentText(e.target.value)}
-              />
-              {errorMsg && <span className="text-red-500">{errorMsg}</span>}
-              <Button
-                onClick={() => handlePostComment(localTask._id)}
-                disabled={newCommentLoading}
-              >
-                {newCommentLoading ? "Posting..." : "Post Comment"}
-              </Button>
-          </div>
-          </div>}
+              {/* Add Comment */}
+              <div className="flex flex-col gap-2 mt-2">
+                <Textarea
+                  placeholder="Write a comment..."
+                  value={newCommentText}
+                  onChange={(e) => setNewCommentText(e.target.value)}
+                />
+                {errorMsg && <span className="text-red-500">{errorMsg}</span>}
+                <Button
+                  onClick={() => handlePostComment(localTask._id)}
+                  disabled={newCommentLoading}>
+                  {newCommentLoading ? "Posting..." : "Post Comment"}
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
         {isEditing && (
           <DialogFooter className="flex !flex-col gap-2">
